@@ -3,46 +3,65 @@
 ## Modules:
 The repo consistes of one module to create DNS Zone and add DNS records to Cloudflare. 
 
+* Terraform docs are very helpful: https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/zone 
+
 ### Adding new DNS Zone:
 
-As I'm using a free Cloudflare plan .. I only need the zone name to create a new zone. To add new zone copy below lines to your `mail.tf` file. (if you need more Zone configuration please edit the module to met your requirements. Terraform docs is very helpful: https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/zone )
-
-```
-dns_zones = {
-    "example.com" = {
-      plan = "free"
-    }
-```
-
-After the DNS zone created , please add `zone_id` to zones_info locals, for example: 
+As we are using a free Cloudflare plan .. we only need the zone name to add a new zone.
+To add new zone copy below lines to `dns_records.tf` file.
 
 ```
 locals {
-  zones_info = {
-    "example_sa_id" = "ex:es12u32083h21b857c4d028rd42"
+
+  zones = {
+    "example_sa" = {
+      name    = "example.sa"
+      plan    = "free"
+      records = []
+    }
   }
 }
+
 ```
+
 ### Adding new DNS Records:
 
-To add new DNS record , after initilailed terraform state and setup your Cloudflare account (email + api_key) .. copy below lines to your `main.tf` file. 
+To add new DNS record , copy below lines to dns_records.tf file under `records = []` for the desired zone. 
 
--  zone_id: The DNS zone ID to add the record to.
 -  name: The name of the record.
--  type: The type of the record.
 -  value: The (string) value of the record.
+-  type: The type of the record.
 -  ttl: The TTL of the record (automatic: '1')
 -  proxied: To show a Cloudflare IP if you look up the record.
 
 
 ```
-  dns_records = {
-    "record.zone.com" = {
-      zone_id = local.zones_info.zone_id
-      value   = "ip address"
-      type    = "record type"
-      ttl     = 1
-      proxied = false
+locals {
+
+  zones = {
+    "example_sa" = {
+      name    = "example.sa"
+      plan    = "free"
+      records = [
+         {
+           name    = "*"
+           value   = "92.68.68.0"
+           type    = "A"
+           ttl     = 1
+           proxied = false
+         },
+
+         {
+           name    = "test"
+           value   = "92.68.68.1"
+           type    = "A"
+           ttl     = 1
+           proxied = false
+         }
+      ] 
     }
+  }
+}
+
 ```
 

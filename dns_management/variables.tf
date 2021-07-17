@@ -1,21 +1,13 @@
-variable "dns_records" {
+variable "zones" {
   type = map(object({
-    zone_id = string
-    value   = string
-    type    = string
-    ttl     = number
-    proxied = string
-
-  }))
-  description = "map of DNS records information"
-
-
-}
-
-# Need a better way to declare this var :)
-variable "dns_zones" {
-  type = map(object({
+    name = string
     plan = string
+    records = list(object({
+      name    = string
+      type    = string
+      ttl     = number
+      value   = string
+      proxied = bool
+    }))
   }))
-  description = "map of DNS zone information"
 }
